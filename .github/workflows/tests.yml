@@ -1,0 +1,35 @@
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+          
+      - name: Install dependencies
+        run: |
+          pip install fastapi uvicorn redis pytest httpx pytest-asyncio
+          
+      - name: Run Tests
+        env:
+          REDIS_HOST: localhost
+        run: |
+          pytest test_main.py
