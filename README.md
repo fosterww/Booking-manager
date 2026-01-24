@@ -1,118 +1,119 @@
 # 🎟️ Async Booking Service (High-Load Simulation)
 
-Микросервис бронирования билетов (кинотеатр/мероприятия), спроектированный для работы под высокой нагрузкой. Реализует защиту от **Race Conditions** (состояния гонки) и двойных продаж.
+A ticket booking microservice (cinema/events) designed to handle high-load scenarios. It implements robust protection against **Race Conditions** and double-booking issues.
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?style=flat&logo=fastapi)
-![Redis](https://img.shields.io/badge/Redis-7.0-red?style=flat&logo=redis)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-blueviolet?style=flat&logo=kubernetes)
+## 🚀 Key Features
 
-## 🚀 Основные возможности
+* **Asynchronous:** Fully non-blocking I/O based on `asyncio` and `redis-py`.
+* **Race Condition Protection:** Utilizes Redis atomic operations (`SET NX`) to prevent two users from booking the same seat simultaneously.
+* **Temporary Reservation (TTL):** Seats are locked for 5 minutes. If the purchase is not completed, Redis automatically releases the slot.
+* **Architecture:**
+* **Dependency Injection:** Redis client is injected via `Depends`.
+* **Pydantic Settings:** Strict configuration typing and environment variable management.
+* **Graceful Shutdown:** Proper connection closure when the service stops.
 
-* **Асинхронность:** Полностью неблокирующий I/O на базе `asyncio` и `redis-py`.
-* **Защита от Race Condition:** Использование атомарных операций Redis (`SET NX`) для предотвращения бронирования одного места двумя пользователями одновременно.
-* **Временная бронь (TTL):** Место бронируется на 5 минут. Если покупка не совершена, Redis автоматически освобождает слот.
-* **Архитектура:**
-    * **Dependency Injection:** Клиент Redis внедряется через `Depends`.
-    * **Pydantic Settings:** Строгая типизация конфигурации и чтение переменных окружения.
-    * **Graceful Shutdown:** Корректное закрытие соединений при остановке сервиса.
+
 * **DevOps:**
-    * Упаковка в **Docker**.
-    * Развертывание в **Kubernetes** (Deployment + Service).
-    * Настроены **Liveness & Readiness Probes** для самовосстановления подов.
+* Packaged in **Docker**.
+* Deployed via **Kubernetes** (Deployment + Service).
+* Configured **Liveness & Readiness Probes** for pod self-healing.
+
 
 ---
 
-## 🛠️ Стек технологий
+## 🛠️ Tech Stack
 
-* **Язык:** Python 3.10
+* **Language:** Python 3.10
 * **Web Framework:** FastAPI
-* **Database:** Redis (хранение состояний, блокировки, TTL)
+* **Database:** Redis (state management, locking, TTL)
 * **Containerization:** Docker
 * **Orchestration:** Kubernetes
 * **Testing:** Pytest, TestClient, FakeRedis (Mock)
 
 ---
 
-## 🏃‍♂️ Запуск проекта
+## 🏃‍♂️ Getting Started
 
-### Вариант 1: Локально (без Docker)
+### Option 1: Local Setup (No Docker)
 
-Требуется запущенный Redis на `localhost:6379`.
+Requires a running Redis instance on `localhost:6379`.
 
-1. Установите зависимости:
-   ```bash
-   pip install fastapi uvicorn redis pydantic-settings
+1. **Install dependencies:**
+```bash
+pip install fastapi uvicorn redis pydantic-settings
 
 ```
 
-2. Запустите сервер:
+
+2. **Start the server:**
 ```bash
 uvicorn main:app --reload
 
 ```
 
 
-Swagger UI будет доступен по адресу: `http://localhost:8000/docs`
+Swagger UI will be available at: `http://localhost:8000/docs`
 
 ---
 
-### Вариант 2: В Kubernetes (Рекомендуется)
+### Option 2: Kubernetes (Recommended)
 
-Убедитесь, что у вас установлен Docker и включен Kubernetes (Minikube или Docker Desktop).
+Ensure you have Docker installed and Kubernetes enabled (Minikube or Docker Desktop).
 
-1. **Сборка Docker-образа:**
+1. **Build the Docker image:**
 ```bash
 docker build -t booking-app:v1 .
 
 ```
 
 
-2. **Деплой в кластер:**
+2. **Deploy to cluster:**
 ```bash
 kubectl apply -f k8s-deployment.yaml
 
 ```
 
 
-3. **Проверка статуса:**
+3. **Check status:**
 ```bash
 kubectl get pods
 
 ```
 
 
-*Подождите, пока статус подов станет `Running`. Если статус долго не меняется, проверьте логи.*
-4. **Доступ к API:**
-Откройте в браузере: [http://localhost:8000/docs](https://www.google.com/search?q=http://localhost:8000/docs)
-*Примечание для Minikube: выполните `minikube service booking-service`, чтобы получить URL.*
+*Wait until the pod status becomes `Running`. If it takes too long, check the logs.*
+4. **Access the API:**
+Open in browser: [http://localhost:8000/docs](https://www.google.com/search?q=http://localhost:8000/docs)
+*Note for Minikube users: run `minikube service booking-service` to retrieve the correct URL.*
 
 ---
 
-## 🧪 Тестирование
+## 🧪 Testing
 
-Проект покрыт unit-тестами с использованием моков (FakeRedis), поэтому для запуска тестов **не требуется** поднимать реальную базу данных.
+The project is covered by unit tests using mocks (FakeRedis), so a real database is **not required** to run tests.
 
-1. Установка тестовых зависимостей:
+1. **Install test dependencies:**
 ```bash
 pip install pytest httpx pytest-asyncio
 
 ```
 
 
-2. Запуск тестов:
+2. **Run tests:**
 ```bash
 pytest test_main.py -v
 
 ```
 
+
+
 ---
 
-## 🔌 Примеры использования API
+## 🔌 API Usage Examples
 
-### 1. Забронировать место (Reserve)
+### 1. Reserve a Seat
 
-Место блокируется на 5 минут (TTL).
+Blocks the seat for 5 minutes (TTL).
 
 **POST** `/reserve`
 
@@ -124,12 +125,12 @@ pytest test_main.py -v
 
 ```
 
-* **200 OK**: `{"status": "reserved"}` — Успешно.
-* **409 Conflict**: Место уже занято другим пользователем.
+* **200 OK**: `{"status": "reserved"}` — Successful.
+* **409 Conflict**: Seat is already occupied by another user.
 
-### 2. Подтвердить покупку (Buy)
+### 2. Confirm Purchase (Buy)
 
-Покупка возможна только если у пользователя есть активная бронь на это место.
+Purchase is only possible if the user holds an active reservation for the seat.
 
 **POST** `/buy`
 
@@ -141,26 +142,31 @@ pytest test_main.py -v
 
 ```
 
-* **200 OK**: `{"status": "sold"}` — Успешно, статус изменен на постоянный.
-* **400 Bad Request**: Бронь истекла или принадлежит другому пользователю.
+* **200 OK**: `{"status": "sold"}` — Successful, status changed to permanent.
+* **400 Bad Request**: Reservation expired or belongs to a different user.
 
-### 3. Получить статус места
+### 3. Get Seat Status
 
 **GET** `/seats/{seat_id}`
 
-* Возвращает: `Available`, `Reserved` или `Sold`.
+* Returns: `Available`, `Reserved`, or `Sold`.
 
 ---
 
-## 📂 Структура проекта
+## 📂 Project Structure
+
+```text
+.
+├── main.py             # Entry point, FastAPI initialization, and business logic
+├── config.py           # Configuration management (Pydantic Settings)
+├── k8s-deployment.yaml # Kubernetes manifests (Redis + App + Services)
+├── Dockerfile          # Image build instructions
+├── test_main.py        # Tests with dependency mocking
+├── requirements.txt    # List of dependencies
+└── README.md           # Project documentation
 
 ```
-.
-├── main.py               # Точка входа, инициализация FastAPI и бизнес-логика
-├── config.py             # Управление конфигурацией (Pydantic Settings)
-├── k8s-deployment.yaml   # Манифесты для Kubernetes (Redis + App + Services)
-├── Dockerfile            # Инструкция для сборки образа
-├── test_main.py          # Тесты с моками зависимостей
-├── requirements.txt      # Список зависимостей
-└── README.md             # Документация проекта
 
+---
+
+**Would you like me to create a `requirements.txt` or `Dockerfile` content based on this description to complete your repository files?**
