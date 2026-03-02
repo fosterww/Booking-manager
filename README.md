@@ -1,8 +1,8 @@
-# 🎟️ Async Booking Service (High-Load Simulation)
+# Async Booking Service (High-Load Simulation)
 
 A ticket booking microservice (cinema/events) designed to handle high-load scenarios. It implements robust protection against **Race Conditions** and double-booking issues.
 
-## 🚀 Key Features
+## Key Features
 
 * **Asynchronous:** Fully non-blocking I/O based on `asyncio` and `redis-py`.
 * **Race Condition Protection:** Utilizes Redis atomic operations (`SET NX`) to prevent two users from booking the same seat simultaneously.
@@ -32,7 +32,7 @@ A ticket booking microservice (cinema/events) designed to handle high-load scena
 
 ---
 
-## 🏃‍♂️ Getting Started
+## Getting Started
 
 ### Option 1: Local Setup (No Docker)
 
@@ -153,7 +153,7 @@ Purchase is only possible if the user holds an active reservation for the seat.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 .
@@ -166,7 +166,3 @@ Purchase is only possible if the user holds an active reservation for the seat.
 └── README.md           # Project documentation
 
 ```
-
----
-
-**Would you like me to create a `requirements.txt` or `Dockerfile` content based on this description to complete your repository files?**
